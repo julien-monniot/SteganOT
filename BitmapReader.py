@@ -41,7 +41,7 @@ class BitmapReader:
 
     def __extract_dib(self):
         """
-        Read DIB header (right after file header).
+        Read DIB header (right after file header).git commit (
         WARNING : DIB headers may vary according to the bitmap version (thannnnnnkkssss Microsoft). This implementation
         only works with BITMAPINFOHEADER (and later ?)
         :return: Dictionary containing the hex string corresponding to every field in bitmap dib header
@@ -57,6 +57,22 @@ class BitmapReader:
         # Fields after that are not taken into account for the moment as we shall only need the above data
 
         return dib_dict
+
+    def __extract_pixels(self):
+        """
+        Read pixel array from bitmap and place every pixel into a list
+        :return: list of all the pixels.
+        """
+        # Get "image_size" which should be the total size of the pixel array
+        image_size = self.dib_dict['image_size']
+        # But sometimes, the parameter is not set (happens when no compression is in use) and shall be computed using
+        # bitmap height and width.
+        # WARNING : What about padding ?? (see : https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png)
+        if image_size == 0:
+            image_size == self.dib_dict['bitmap_width']*self.dib_dict['bitmap_height']
+
+        raw_pixel_array = self.bitmap_array[self.header_dict['pixel_array_offset']:(self.header_dict['pixel_array_offset']+image_size)]
+
 
     def get_pixel_array(self):
         """
