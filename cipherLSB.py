@@ -37,7 +37,8 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
     # Check whether carrier file is big enough to store input file (assuming we are working with bitmaps)
     bitmap_reader = BitmapReader(carrier_bytes)
     print(bitmap_reader.get_header())
-
+    print(bitmap_reader.get_dib_header())
+    print(bitmap_reader.has_compression())
 
 
 '''
