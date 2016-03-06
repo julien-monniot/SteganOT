@@ -7,6 +7,7 @@ class BitmapReader:
         self.bitmap_array = byte_bitmap_array
         self.header_dict = self.__extract_header()
         self.dib_dict = self.__extract_dib()
+        self.pixel_array = self.__extract_pixels()
 
     def get_header(self):
         """
@@ -73,11 +74,18 @@ class BitmapReader:
 
         raw_pixel_array = self.bitmap_array[self.header_dict['pixel_array_offset']:(self.header_dict['pixel_array_offset']+image_size)]
 
+        # Let's extract a list of pixels from the raw array, excluding 4-bytes padding.
+
+        pixel_size = self.dib_dict['bits_per_pixels']
+
+
+        return raw_pixel_array
 
     def get_pixel_array(self):
         """
         :return: PixelArray of the bmp file (found thanks to offset in header)
         """
+        return self.
         pass
 
     def get_bitmap_array(self):
