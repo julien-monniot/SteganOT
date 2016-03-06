@@ -39,6 +39,7 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
     print(bitmap_reader.get_header())
     print(bitmap_reader.get_dib_header())       # Warning, still specific latest bitmap versionS
     print(bitmap_reader.has_compression())
+    print(bitmap_reader.get_pixel_array())
 
 '''
         while byte != '':

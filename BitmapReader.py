@@ -81,14 +81,17 @@ class BitmapReader:
 
         pixel_size = self.dib_dict['bits_per_pixel'] # how many bits are needed for one pixel in the array
 
-        padding = img_width%32  # 4-bytes padding
-        print("Padding = "+str(padding))
-        line_width = img_width + padding
-        print("Total line width = "+str(line_width))
-        for i in range(0,image_size,img_width):
-            pass
+        padding_modulo = img_width % 4  # 4-bytes padding
+        line_width = img_width + (4-padding_modulo)
+        print("Total line width = "+str(line_width)+" ("+str(img_width)+" pixels + "+str((4-padding_modulo))+" bits of padding)")
 
-        return raw_pixel_array
+        pixel_array = []
+        for line in range(0, image_size, line_width):    # loop on every line of the pixel array.
+            c_line = raw_pixel_array[line:(line+line_width)]    # temp of the current line
+            for pixel in range(0, (line_width - (line_width-img_width))*8, pixel_size):
+                pixel_array.append(c_line[pixel:pixel+pixel_size])
+
+        return pixel_array
 
     def get_pixel_array(self):
         """
