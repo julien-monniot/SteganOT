@@ -31,6 +31,10 @@ class BitmapReader:
         return self.dib_dict
 
     def has_compression(self):
+        """
+        This method checks whether the bitmap image uses some sort of compression or not.
+        :return: True if compression is in use, False otherwise
+        """
         if self.dib_dict['compression'] not in [0, 11]:    # https://en.wikipedia.org/wiki/BMP_file_format
             return True
         else:
@@ -70,7 +74,8 @@ class BitmapReader:
 
     def __extract_pixels(self):
         """
-        Read pixel array from bitmap and place every pixel into a list
+        Read pixel array from bitmap and place every pixel into a list (so the pixel array is stripped from its
+        potential padding)
         :return: list of all the pixels.
         """
 
@@ -102,9 +107,31 @@ class BitmapReader:
 
     def get_pixel_array(self):
         """
-        :return: PixelArray of the bmp file (found thanks to offset in header)
+        :return: PixelArray of the bmp file, as a list of bytearray. Each bytearray encodes 1 pixel. Padding removed.
         """
         return self.pixel_array
+
+    def set_pixel_array(self, pixel_array):
+        """
+        Give a modified pixel array to this methods (with altered bytes in it) and it will rewrite it into the bitmap
+        array, including padding.
+        :param pixel_array: A list ob bytearrays representing the pixels.
+        :return: True is set succed or false if not
+        """
+
+        # 1) Check if returned input pixel array has the same size as original pixel array
+        # 2) Add padding to input pixel array, according to img_width * (pixel_size/8)
+        # 3) Replace old pixel array with new pixel array
+
+        return True
+
+    def save_bitmap(self, out_filename):
+        """
+        Save current bitmap_array as a bitmap image file.
+        :param out_filename Name of the output file ('.bmp' will be appended by this method)
+        :return:
+        """
+
         pass
 
     def get_bitmap_array(self):
