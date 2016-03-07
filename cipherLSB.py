@@ -24,22 +24,14 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
     print(input_bytes)
     print(input_length)
 
-    # Open the carrier file :
-    try:
-        ca_f = open(carrier_file, "rb")
-        carrier_bytes = bytearray(ca_f.read())
-    except IOError as e:
-        print("## ERROR : Carrier file couldn't be openned for reading")
-        exit(1)
 
-    ca_f.close()
 
     # Check whether carrier file is big enough to store input file (assuming we are working with bitmaps)
-    bitmap_reader = BitmapReader(carrier_bytes)
+    bitmap_reader = BitmapReader(carrier_file)
     print(bitmap_reader.get_header())
     print(bitmap_reader.get_dib_header())       # Warning, still specific latest bitmap versionS
     print(bitmap_reader.has_compression())
-    print(bitmap_reader.get_pixel_array())
+    print(bitmap_reader.get_pixel_array()[0:25])
 
 '''
         while byte != '':

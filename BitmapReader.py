@@ -3,8 +3,17 @@
 
 class BitmapReader:
 
-    def __init__(self, byte_bitmap_array):
-        self.bitmap_array = byte_bitmap_array
+    def __init__(self, carrier_file):
+        # Open the carrier file :
+        try:
+            ca_f = open(carrier_file, "rb")
+            carrier_bytes = bytearray(ca_f.read())
+        except IOError as e:
+            print("## ERROR : Carrier file couldn't be openned for reading")
+            exit(1)
+        ca_f.close()
+
+        self.bitmap_array = carrier_bytes
         self.header_dict = self.__extract_header()
         self.dib_dict = self.__extract_dib()
         self.pixel_array = self.__extract_pixels()
@@ -65,31 +74,29 @@ class BitmapReader:
         :return: list of all the pixels.
         """
 
-        # Get "image_size" which should be the total size of the pixel array
-        image_size = self.dib_dict['image_size']
-        # But sometimes, the parameter is not set (happens when no compression is in use) and shall be computed using
-        # bitmap height and width.
-        # WARNING : What about padding ?? (see : https://upload.wikimedia.org/wikipedia/commons/c/c4/BMPfileFormat.png)
+        # 1) Compute size of pixel_array : it is equal to (img_width * (pixel_size/8) + padding) * img_height
         img_width = self.dib_dict['bitmap_width']
         img_height = self.dib_dict['bitmap_height']
-        if image_size == 0:
-            image_size = img_width * img_height
+        pixel_size = self.dib_dict['bits_per_pixel']  # how many bits are needed for 1 pixel in the array (/8 for bytes)
+        padding = 4 - (img_width % 4)  # 4-bytes padding
+        line_width = (img_width * int(pixel_size/8) + padding)
+        print("Total line width = "+str(line_width))
+        pixel_array_size = line_width * img_height
+        print("Image size is : "+str(pixel_array_size))
 
-        raw_pixel_array = self.bitmap_array[self.header_dict['pixel_array_offset']:self.header_dict['pixel_array_offset'] + image_size]
+        # 2) Extract raw pixel array (part of the bytearray, including padding bytes)
+        pixela_array_off = self.header_dict['pixel_array_offset']
+        raw_pixel_array = self.bitmap_array[pixela_array_off:pixela_array_off + pixel_array_size]
+        print("Raw pixel array starts at "+hex(pixela_array_off)+" and ends at "+hex(pixela_array_off+pixel_array_size))
 
-        # Let's extract a list of pixels from the raw array, excluding 4-bytes padding.
-
-        pixel_size = self.dib_dict['bits_per_pixel'] # how many bits are needed for one pixel in the array
-
-        padding_modulo = img_width % 4  # 4-bytes padding
-        line_width = img_width + (4-padding_modulo)
-        print("Total line width = "+str(line_width)+" ("+str(img_width)+" pixels + "+str((4-padding_modulo))+" bits of padding)")
-
+        # 3) Now, extract a list of pixels from the raw pixel array, excluding 4-bytes padding.
         pixel_array = []
-        for line in range(0, image_size, line_width):    # loop on every line of the pixel array.
-            c_line = raw_pixel_array[line:(line+line_width)]    # temp of the current line
-            for pixel in range(0, (line_width - (line_width-img_width))*8, pixel_size):
-                pixel_array.append(c_line[pixel:pixel+pixel_size])
+        for line_start in range(0, pixel_array_size, line_width):    # loop on every line of the pixel array.
+            c_line = raw_pixel_array[line_start:(line_start+line_width)]    # temp of the current line
+            # print("# Current line : "+str(c_line))
+            # print("# Line len : "+str(len(c_line)))
+            for pixel in range(0, (line_width - (line_width-img_width)), int(pixel_size/8)):
+                pixel_array.append(c_line[pixel:pixel+int(pixel_size/8)])
 
         return pixel_array
 
