@@ -21,21 +21,26 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
 
     # Now we have a byte array of our input file, elegantly named "input_bytes".
     input_bytes[0] ^= 1
-    print(input_bytes)
-    print(input_length)
+    #print(input_bytes)
+    #print(input_length)
 
 
 
     # Check whether carrier file is big enough to store input file (assuming we are working with bitmaps)
     bitmap_reader = BitmapReader(carrier_file)
+
+    array = bitmap_reader.get_pixel_array()
+    print(array)
+
+    print(array[5])
+    array[5] = bytearray(b'\x01')
+    print(array[5])
+
+    bitmap_reader.set_pixel_array(array)
+    bitmap_reader.save_bitmap(output_file)
+    """
     print(bitmap_reader.get_header())
     print(bitmap_reader.get_dib_header())       # Warning, still specific latest bitmap versionS
     print(bitmap_reader.has_compression())
     print(bitmap_reader.get_pixel_array()[0:25])
-
-'''
-        while byte != '':
-            # Do stuff with byte.
-            byte = in_f.read(1)
-            print(byte)
-'''
+    """
