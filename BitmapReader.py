@@ -139,13 +139,13 @@ class BitmapReader:
 
         # Loop on line beginning index for no-padding pixel array.
 
-        print('Len(pixel_array): '+str(len(pixel_array)))
-        print('Lenght of line (no pad) : '+str(line_width_no_pad))
+        #print('Len(pixel_array): '+str(len(pixel_array)))
+        #print('Lenght of line (no pad) : '+str(line_width_no_pad))
 
         for line_start in range(0, len(pixel_array), line_width_no_pad):
             new_line = bytearray()
 
-            print("Line start : "+str(line_start))
+            #print("Line start : "+str(line_start))
             for i in range(0, line_width_no_pad):
                 new_line += pixel_array[line_start+i]
 
@@ -154,11 +154,11 @@ class BitmapReader:
                 new_line.append(0x00)
             padded_array += new_line
 
-            print("New line: ")
-            print(new_line)
+            #print("New line: ")
+            #print(new_line)
 
-        print("Padded array :")
-        print(padded_array)
+        #print("Padded array :")
+        #print(padded_array)
 
         # 3) Replace old pixel array with new pixel array
         pixel_array_off = self.header_dict['pixel_array_offset']
