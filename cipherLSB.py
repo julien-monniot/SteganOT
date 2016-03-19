@@ -51,12 +51,12 @@ def cipher_lsb_txt(input_file, carrier_file, output_file, n_bits):
     bit_mask = int(math.pow(2, n_bits) - 1)
 
     # Copy bits in pixels
-    for ind in range(0, len(input_bits), n_bits):
+    for ind in range(0, len(input_bits), 1):
         pixels[ind][0] = (pixels[ind][0] & ~bit_mask)
         for step in range(ind, ind + n_bits):
             i = step - ind
             if step < len(input_bits):
-                pixels[ind][0] |=  int(input_bits[step]) << (n_bits -1 - i)
+                pixels[ind][0] |= int(input_bits[step]) << (n_bits - 1 - i)
 
 
     print("Copy OK")
