@@ -49,7 +49,6 @@ if __name__ == "__main__":
 
     # Parse program arguments.
     parsedArguments = arg_parser(sys.argv[1:])
-    print(parsedArguments)
 
     if parsedArguments['m'] == 'cip':
 

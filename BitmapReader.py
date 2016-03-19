@@ -82,7 +82,10 @@ class BitmapReader:
         img_width = self.dib_dict['bitmap_width']
         img_height = self.dib_dict['bitmap_height']
         pixel_size = self.dib_dict['bits_per_pixel']  # how many bits are needed for 1 pixel in the array (/8 for bytes)
-        padding = 4 - (img_width % 4)  # 4-bytes padding
+        if img_width % 4 != 0:
+            padding = 4 - (img_width % 4)  # 4-bytes padding
+        else:
+            padding = 0
         line_width = (img_width * int(pixel_size/8) + padding)
         #print("Total line width = "+str(line_width))
         pixel_array_size = line_width * img_height
@@ -141,6 +144,7 @@ class BitmapReader:
             padding = 4 - (img_width % 4)  # 4-bytes padding
         else:
             padding = 0
+
         #print("Will add "+str(padding)+" bytes of padding to each line")
         # empty bytearray() that will take the place of the 'raw_byte_array' from __extract_pixel_array
         padded_array = bytearray()

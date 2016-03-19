@@ -4,57 +4,54 @@ import copy
 
 
 def cipher_lsb_txt(input_file, carrier_file, output_file):
-    # Cipher lsb mode
+    """
+    Cipher a text into an image (LSB)
+    :param input_file: file containing text to hide
+    :param carrier_file: image in which the text will be hidden
+    :param output_file: output image with hidden text included
+    :return: True if ok, False in case of problem (eg. plain text too long...)
+    """
 
-    print("# In cipher lsb text wrapper with parameters :"
-          "\n\t-Input file : " + input_file + "\n\t-Carrier Image : " + carrier_file + "\n\t-Output File : " + output_file)
-
-    # Open input file :
+    # Open input file and extract bytes:
     try:
         in_f = open(input_file, "rb")
         input_bytes = bytearray(in_f.read())
     except IOError as e:
         print("## ERROR : Input file couldn't be openned for reading")
         exit(1)
-
     in_f.close()
-
     input_length = len(input_bytes)
 
-    # Now we have a byte array of our input file, elegantly named "input_bytes".
-    print("Input text is :")
+    print("# Input text is :")
     print(input_bytes)
-    print("The lenght (in bytes) is : "+str(input_length))
+    print("# Length of text is "+str(input_length)+" bytes / "+str(input_length*8)+" bits.")
 
     # Check whether carrier file is big enough to store input file (assuming we are working with bitmaps)
     bitmap_reader = BitmapReader(carrier_file)
     pixels = bitmap_reader.get_pixel_array()
-    old_pixels = copy.deepcopy(pixels)
-
-    print("Lenght of pixel array = "+str(len(pixels)))
     if len(pixels) < (input_length * 8 + 1):    # +1 for size of message on 8 bits
-        return False                         # Not enough space in pixel array to store data
+        print("## ERROR : Plain text is too long ("+str(input_length*8)+" bits) for image carrier ("+str(len(pixels))+" bytes). ##\n### EXITING ###")
+        return False
 
-    # Create list of all bits to hide in image
+    # Create list of all bits (not bytes) to hide in image
     input_bits = []
-    # first add number of bytes in message
+    # First byte will be the length of the hidden data
     input_bits += format(input_length, '08b')
 
     for ind in range(0, input_length):
         bits = format(input_bytes[ind], '08b')
         input_bits += bits
 
-    print("Lenght of input bits array : "+str(len(input_bits)))
+    print("# "+str(len(input_bits))+" bits will be written to carrier image.")
 
-    # Copy bits in pixels
+    # Actual copy of input bits into carrier pixel array.
     for ind in range(0, len(input_bits)):
         pixels[ind][0] = (pixels[ind][0] & ~1) | int(input_bits[ind])
-
-    print("Copy OK")
 
     # Push back pixels and save bmp
     bitmap_reader.set_pixel_array(pixels)
     bitmap_reader.save_bitmap(output_file)
+    print("# Cipher DONE (written to file "+output_file+")")
     return True
 
 
@@ -66,9 +63,12 @@ def decipher_lsb_txt(input_file, output_file):
     :return:True or False depending on success of deciphering
     """
 
+    # Read pixel array from input image
     bitmap_reader = BitmapReader(input_file)
     pixels = bitmap_reader.get_pixel_array()
+    # Read message size (first 8 bits hidden in pixel array)
     size_bits = []
+
     for i in range(0, 8):
         print("Byte = "+hex(pixels[i][0]))
         binary_pixel = format(pixels[i][0], "08b")
@@ -78,7 +78,7 @@ def decipher_lsb_txt(input_file, output_file):
     for bit in size_bits:
         size = (size << 1) | int(bit)
 
-    print("The message to decipher is "+str(size)+" bytes long.")
+    print("# The message to decipher is "+str(size)+" bytes long.")
 
     # Decipher, from 8 first bytes to end of message
     output = open(output_file, "wb")
@@ -92,7 +92,7 @@ def decipher_lsb_txt(input_file, output_file):
             output.write(out)
             text = ""
 
-    print("Deciphering OK")
+    print("# Decipher DONE (written to file "+output_file+")")
     output.close()
 
 
