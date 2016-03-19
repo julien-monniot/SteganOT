@@ -3,7 +3,7 @@ from BitmapReader import BitmapReader
 import copy
 import math
 
-n_bits = 2
+n_bits = 1
 bit_mask = int(math.pow(2, n_bits) - 1)
 
 def cipher_lsb_txt(input_file, carrier_file, output_file):
@@ -38,8 +38,6 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
 
     # Create list of all bits (not bytes) to hide in image
     input_bits = []
-    # First byte will be the length of the hidden data
-    input_bits += format(input_length, '08b')
 
     print('Input length in byte '+format(input_length, '08b'))
 
@@ -48,11 +46,9 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
         input_bits += bits
 
     print("# "+str(len(input_bits))+" bits will be written to carrier image.")
-
-
-    # Actual copy of input bits into carrier pixel array.
-    for ind in range(0, len(input_bits)):
-        pixels[ind][0] = (pixels[ind][0] & ~1) | int(input_bits[ind])
+    
+    # Add a stopping character
+    input_bits += format(0, '08b')
 
     for ind in range(0, len(input_bits), n_bits):
         pixels[ind][0] = (pixels[ind][0] & ~bit_mask)
@@ -82,28 +78,16 @@ def decipher_lsb_txt(input_file, output_file):
     # Read pixel array from input image
     bitmap_reader = BitmapReader(input_file)
     pixels = bitmap_reader.get_pixel_array()
-    # Read message size (first 8 bits hidden in pixel array)
-    size_bits = []
-
-    for i in range(0, 8):
-        print("Byte = "+hex(pixels[i][0]))
-        binary_pixel = format(pixels[i][0], "08b")
-        size_bits += binary_pixel[len(binary_pixel)-1]
-
-    size = 0
-    for bit in size_bits:
-        size = (size << 1) | int(bit)
-
-    print("# The message to decipher is "+str(size)+" bytes long.")
 
     # Decipher, from 8 first bytes to end of message
     output = open(output_file, "wb")
     text = ""
-    for ind in range(8, 8+(int(size / n_bits)*8), n_bits):
+    for ind in range(0, 100000, n_bits):
         binary_pixel = format(pixels[ind][0], "08b")
         text += binary_pixel[(len(binary_pixel) -n_bits):]
         if len(text) % 8 == 0:
-            print(text)
+            if text == format(0, '08b'):    # Detect stopping character
+                break
             out = int(text, 2).to_bytes(1, 'little')
             output.write(out)
             text = ""
