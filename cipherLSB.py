@@ -1,7 +1,10 @@
 # This module will contain the cipher / decipher algos and
 from BitmapReader import BitmapReader
 import copy
+import math
 
+n_bits = 2
+bit_mask = int(math.pow(2, n_bits) - 1)
 
 def cipher_lsb_txt(input_file, carrier_file, output_file):
     # Cipher lsb mode
@@ -47,8 +50,11 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
     print("Lenght of input bits array : "+str(len(input_bits)))
 
     # Copy bits in pixels
-    for ind in range(0, len(input_bits)):
-        pixels[ind][0] = (pixels[ind][0] & ~1) | int(input_bits[ind])
+    for ind in range(0, len(input_bits), n_bits):
+        pixels[ind][0] = (pixels[ind][0] & ~bit_mask)
+        for step in range(ind, n_bits):
+            pixels[ind][0] |=  int(input_bits[step])
+
 
     print("Copy OK")
 
