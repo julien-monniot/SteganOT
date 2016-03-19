@@ -4,7 +4,7 @@
 
 import sys
 import argparse
-from cipherLSB import cipher_lsb_txt
+from cipherLSB import cipher_lsb_txt, decipher_lsb_txt
 
 # Naughty, dirty globals :
 
@@ -70,6 +70,15 @@ if __name__ == "__main__":
             # Will make a call to a cipher wrapper called cipherLSB_DCT
             pass
 
-    else:
-        print("# Decipher mode")
+    elif parsedArguments['m'] == 'decip':
+
+        # Call appropriate module
+        if parsedArguments['a'] == algos[0]:
+            decipher_lsb_txt(parsedArguments['i'], parsedArguments['o'])
+        elif parsedArguments['a'] == algos[1]:
+            # Will make a call to a cipher wrapper called cipherLSB_img
+            pass
+        elif parsedArguments['a'] == algos[2]:
+            # Will make a call to a cipher wrapper called cipherLSB_DCT
+            pass
 

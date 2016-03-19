@@ -1,6 +1,5 @@
 # BITMAP reader utility
 
-
 class BitmapReader:
 
     def __init__(self, carrier_file):
@@ -110,7 +109,8 @@ class BitmapReader:
         """
         :return: PixelArray of the bmp file, as a list of bytearray. Each bytearray encodes 1 pixel. Padding removed.
         """
-        return self.pixel_array
+        pixel_array = self.pixel_array
+        return pixel_array
 
     def set_pixel_array(self, pixel_array):
         """
@@ -132,8 +132,16 @@ class BitmapReader:
             # The given pixel array size doesn't have the right size
             return False
 
+        #print("New pixel array :")
+        #[print(hex(pixel_array[i][0])+" ", end="") for i in range(0, len(pixel_array))]
+        #print()
+
         # 2) Add padding to input pixel array, according to img_width * (pixel_size/8)
-        padding = 4 - (img_width % 4)  # 4-bytes padding
+        if img_width % 4 != 0:
+            padding = 4 - (img_width % 4)  # 4-bytes padding
+        else:
+            padding = 0
+        #print("Will add "+str(padding)+" bytes of padding to each line")
         # empty bytearray() that will take the place of the 'raw_byte_array' from __extract_pixel_array
         padded_array = bytearray()
 
@@ -150,12 +158,10 @@ class BitmapReader:
                 new_line += pixel_array[line_start+i]
 
             # append enough byte of padding to the line
-            for i in range(1, padding):
+            for i in range(0, padding):
                 new_line.append(0x00)
             padded_array += new_line
 
-            #print("New line: ")
-            #print(new_line)
 
         #print("Padded array :")
         #print(padded_array)
@@ -165,7 +171,6 @@ class BitmapReader:
         # self.bitmap_array[pixel_array_off:pixel_array_off + len(padded_array)] = padded_array
         for i in range(pixel_array_off, pixel_array_off + len(padded_array)):
             self.bitmap_array[i] = padded_array[i-pixel_array_off]
-
         return True
 
     def save_bitmap(self, out_filename):
@@ -178,6 +183,7 @@ class BitmapReader:
         f.write(self.bitmap_array)
 
     def get_bitmap_array(self):
-        return self.bitmap_array
+        array = self.bitmap_array
+        return array
 
 
