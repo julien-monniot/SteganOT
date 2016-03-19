@@ -41,6 +41,8 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
     # First byte will be the length of the hidden data
     input_bits += format(input_length, '08b')
 
+    print('Input length in byte '+format(input_length, '08b'))
+
     for ind in range(0, input_length):
         bits = format(input_bytes[ind], '08b')
         input_bits += bits
@@ -52,13 +54,15 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
     for ind in range(0, len(input_bits)):
         pixels[ind][0] = (pixels[ind][0] & ~1) | int(input_bits[ind])
 
-    # Commented because of conflict when pushing
-    """ # Copy bits in pixels
     for ind in range(0, len(input_bits), n_bits):
         pixels[ind][0] = (pixels[ind][0] & ~bit_mask)
-        for step in range(ind, n_bits):
-            pixels[ind][0] |=  int(input_bits[step])
-    """
+        for step in range(ind, ind + n_bits):
+            i = step - ind
+            if step < len(input_bits):
+                pixels[ind][0] |=  int(input_bits[step]) << (n_bits -1 - i)
+
+
+    print("Copy OK")
 
     # Push back pixels and save bmp
     bitmap_reader.set_pixel_array(pixels)
@@ -95,9 +99,9 @@ def decipher_lsb_txt(input_file, output_file):
     # Decipher, from 8 first bytes to end of message
     output = open(output_file, "wb")
     text = ""
-    for ind in range(8, 8+(size*8)):
+    for ind in range(8, 8+(int(size / n_bits)*8), n_bits):
         binary_pixel = format(pixels[ind][0], "08b")
-        text += binary_pixel[len(binary_pixel)-1]
+        text += binary_pixel[(len(binary_pixel) -n_bits):]
         if len(text) % 8 == 0:
             print(text)
             out = int(text, 2).to_bytes(1, 'little')
