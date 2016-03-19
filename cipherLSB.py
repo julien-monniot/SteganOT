@@ -2,6 +2,7 @@
 from BitmapReader import BitmapReader
 import copy
 import math
+import sys
 
 def cipher_lsb_txt(input_file, carrier_file, output_file, n_bits):
     # Cipher lsb mode
@@ -83,7 +84,7 @@ def decipher_lsb_txt(input_file, output_file, n_bits):
     # Decipher, from 8 first bytes to end of message
     output = open(output_file, "wb")
     text = ""
-    for ind in range(0, 100000, n_bits):
+    for ind in range(0, sys.maxsize, n_bits):
         binary_pixel = format(pixels[ind][0], "08b")
         text += binary_pixel[(len(binary_pixel) -n_bits):]
         if len(text) % 8 == 0:
