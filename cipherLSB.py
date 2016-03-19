@@ -3,10 +3,8 @@ from BitmapReader import BitmapReader
 import copy
 import math
 
-n_bits = 1
-bit_mask = int(math.pow(2, n_bits) - 1)
-
-def cipher_lsb_txt(input_file, carrier_file, output_file):
+def cipher_lsb_txt(input_file, carrier_file, output_file, n_bits):
+    # Cipher lsb mode
     """
     Cipher a text into an image (LSB)
     :param input_file: file containing text to hide
@@ -50,6 +48,9 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
     # Add a stopping character
     input_bits += format(0, '08b')
 
+    bit_mask = int(math.pow(2, n_bits) - 1)
+
+    # Copy bits in pixels
     for ind in range(0, len(input_bits), n_bits):
         pixels[ind][0] = (pixels[ind][0] & ~bit_mask)
         for step in range(ind, ind + n_bits):
@@ -67,7 +68,7 @@ def cipher_lsb_txt(input_file, carrier_file, output_file):
     return True
 
 
-def decipher_lsb_txt(input_file, output_file):
+def decipher_lsb_txt(input_file, output_file, n_bits):
     """
     Decipher a text hidden in an image
     :param input_file: file within which is hidden the text

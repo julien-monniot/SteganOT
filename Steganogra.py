@@ -11,6 +11,7 @@ from cipherLSB import cipher_lsb_txt, decipher_lsb_txt
 ERR_STR = "## ERROR : "
 modes = ['cip', 'decip']
 algos = ['lsb-txt', 'lsb-img', 'lsb-dct-img']
+bits = ['1', '2', '4', '8']
 default_output = "steganOUT"
 
 def arg_parser(argv):
@@ -41,6 +42,11 @@ def arg_parser(argv):
                         help="Algo used to hide information.",
                         choices=algos
                         )
+    parser.add_argument('-b',
+                        default=bits[0],
+                        help="[Optional] Number of bits used to store information per byte",
+                        choices=bits
+                        )
 
     return vars(parser.parse_args(argv))
 
@@ -61,7 +67,7 @@ if __name__ == "__main__":
 
         # Call appropriate module
         if parsedArguments['a'] == algos[0]:
-            cipher_lsb_txt(parsedArguments['i'], parsedArguments['c'], parsedArguments['o'])
+            cipher_lsb_txt(parsedArguments['i'], parsedArguments['c'], parsedArguments['o'], int(parsedArguments['b']))
         elif parsedArguments['a'] == algos[1]:
             # Will make a call to a cipher wrapper called cipherLSB_img
             pass
@@ -73,7 +79,7 @@ if __name__ == "__main__":
 
         # Call appropriate module
         if parsedArguments['a'] == algos[0]:
-            decipher_lsb_txt(parsedArguments['i'], parsedArguments['o'])
+            decipher_lsb_txt(parsedArguments['i'], parsedArguments['o'], int(parsedArguments['b']))
         elif parsedArguments['a'] == algos[1]:
             # Will make a call to a cipher wrapper called cipherLSB_img
             pass
