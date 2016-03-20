@@ -24,9 +24,9 @@ def cipher_lsb_txt(input_file, carrier_file, output_file, n_bits):
     in_f.close()
     input_length = len(input_bytes)
 
-    print("# Input text is :")
-    print(input_bytes)
-    print("# Length of text is "+str(input_length)+" bytes / "+str(input_length*8)+" bits.")
+    #print("# Input text is :")
+    #print(input_bytes)
+    #print("# Length of text is "+str(input_length)+" bytes / "+str(input_length*8)+" bits.")
 
     # Check whether carrier file is big enough to store input file (assuming we are working with bitmaps)
     bitmap_reader = BitmapReader(carrier_file)
@@ -38,7 +38,7 @@ def cipher_lsb_txt(input_file, carrier_file, output_file, n_bits):
     # Create list of all bits (not bytes) to hide in image
     input_bits = []
 
-    print('Input length in byte '+format(input_length, '08b'))
+    #print('Input length in byte '+format(input_length, '08b'))
 
     for ind in range(0, input_length):
         bits = format(input_bytes[ind], '08b')
@@ -60,7 +60,7 @@ def cipher_lsb_txt(input_file, carrier_file, output_file, n_bits):
                 pixels[ind][0] |= int(input_bits[step]) << (n_bits - 1 - i)
 
 
-    print("Copy OK")
+    #print("Copy OK")
 
     # Push back pixels and save bmp
     bitmap_reader.set_pixel_array(pixels)
